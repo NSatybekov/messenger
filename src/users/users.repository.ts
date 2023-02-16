@@ -19,16 +19,16 @@ export class UserRepository {
     async signUp(data: UserLoginInterface) {
         const result = await this.db.table(this.TABLE_NAME)
                                     .insert(data)
-                                    .returning(['id', 'firstname', 'lastname', 'email'])
+                                    .returning(['user_id', 'firstname', 'lastname', 'email'])
         return result[0]
     }
 
     async findUser(id: number) {
-        const result = await this.db.table(this.TABLE_NAME).where('id', id)
+        const result = await this.db.table(this.TABLE_NAME).where('user_id', id)
         return result[0]
     }
 
-    async findUserByEmail(email: string) {
+    async findUserByEmail(email: string) { 
         const result = await this.db.table(this.TABLE_NAME)
                                     .where('email', email)
         return result[0]

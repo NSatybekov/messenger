@@ -13,7 +13,7 @@ export class UsersService {
   constructor(@InjectModel() private readonly knex: Knex,
               private readonly repository: UserRepository) {}
 
-  async findAll() : Promise<object> {
+  async  findAll() : Promise<object>  {
     const users = await this.repository.findAll();
     return { users };
   }
@@ -21,10 +21,10 @@ export class UsersService {
   async findOne(id: number) : Promise<object> {
     try{
       const user = await this.repository.findUser(id)
-      const {hash, ...userWithoutHash} = user
-      if(user.length === 0) {  // i have used user.length because db is always returning array, that is returning true if i check it like this - !user
+      if(!user) {  
         throw new NotFoundException(`User ${id} does not exist`)
       }
+      const {hash, ...userWithoutHash} = user
       return userWithoutHash
     }
     catch (err) {

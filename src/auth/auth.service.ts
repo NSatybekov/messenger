@@ -26,7 +26,7 @@ export class AuthService{
         try{ 
             const user = await this.repository.signUp(data);  // do i need to refer what type of value (interface) need to contain this function from repo? 
 
-            return this.signToken(user.id, user.email)
+            return this.signToken(user.user_id, user.email)
         } catch (err) {
             throw new HttpException(err, HttpStatus.BAD_REQUEST);
           }
@@ -45,7 +45,7 @@ export class AuthService{
         if(!passMatches) {
             throw new ForbiddenException('Credentials incorrect')
         }
-        return this.signToken(user.id, user.email)
+        return this.signToken(user.user_id, user.email)
     }
 
     async signToken(userId: number, email: string): Promise<object> {

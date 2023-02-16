@@ -9,6 +9,7 @@
             table.string('from_email', 255).notNullable()
                                            .references('email').inTable('users');
             table.string('message_text', 255).notNullable()
+            table.timestamp('sent_datetime').defaultTo(knex.fn.now())
         })
   
 };

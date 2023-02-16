@@ -6,6 +6,8 @@ import {KnexModule} from 'nest-knexjs'
 import { Knex } from 'knex';
 import { UsersModule } from './users/users.module';
 import { MessageModule } from './message/message.module';
+import { ChatModule } from './chat/chat.module';
+import { ChatMemberModule } from './chat_member/chat_member.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { MessageModule } from './message/message.module';
       isGlobal: true
     }),
     MessageModule,
+    ChatModule,
+    ChatMemberModule,
   ]
 })
 export class AppModule {}

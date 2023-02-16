@@ -10,7 +10,7 @@ import { IsEmail, IsNotEmpty, IsString } from "class-validator"
 
 export interface MessageInterface { 
     from_email: string,
-    message_text: string
+    message_text: string,
 }
 
 

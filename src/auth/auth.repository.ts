@@ -11,14 +11,14 @@ export class AuthRepository {  // need to change data from auth DTO to user inte
     async signUp(data: UserLoginInterface) {
         const result = await this.db.table(this.TABLE_NAME)
                                     .insert(data)
-                                    .returning(['id', 'firstname', 'lastname', 'email'])
+                                    .returning(['user_id', 'firstname', 'lastname', 'email'])
         return result[0]
     }
 
     async findUserByEmail(email: string) {
         const result = await this.db.table(this.TABLE_NAME)
                                     .where('email', email)
-                                    .returning(['id', 'firstname', 'lastname', 'email'])
+                                    .returning(['user_id', 'firstname', 'lastname', 'email'])
         return result[0]
     }
 
