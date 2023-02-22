@@ -1,14 +1,19 @@
 import {IsNotEmpty, IsString } from "class-validator"
+import {ApiProperty} from "@nestjs/swagger"
 
 export class ChatNameDto {
+   @ApiProperty({example: 'First Chat'})
    @IsNotEmpty() 
    @IsString() 
-   chat_name: string;
+   name: string;
 }
 
-export interface ChatInterface { 
-   chat_name: string,
-   admin_id: number
+export interface ChatRegistryInterface { 
+   name: string
+}
+
+export interface ChatInterface extends ChatRegistryInterface {
+   chat_id: number
 }
 
 

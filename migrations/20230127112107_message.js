@@ -6,10 +6,12 @@
     return knex.schema
         .createTable('message', function (table) {
             table.increments('message_id');
-            table.string('from_email', 255).notNullable()
-                                           .references('email').inTable('users');
-            table.string('message_text', 255).notNullable()
-            table.timestamp('sent_datetime').defaultTo(knex.fn.now())
+            table.integer('user_id', 255).notNullable()
+                                           .references('users.user_id').onDelete('CASCADE');
+            table.string('text', 255).notNullable()
+            table.timestamp('created_at').defaultTo(knex.fn.now())
+            table.integer('chat_id').index()
+                table.foreign('chat_id').references('chat.chat_id').onDelete('CASCADE')
         })
   
 };
@@ -20,9 +22,6 @@
  */
  exports.down = function(knex) {
     return knex.schema
-      .table('message', function (table) {
-          table.dropForeign('from_email');
-      })
       .dropTable('message')
   };
   

@@ -3,11 +3,11 @@ import { IsEmail, IsNotEmpty, IsString } from "class-validator"
  export class AuthDto {
     @IsNotEmpty()
     @IsString()
-    firstname: string;
+    first_name: string;
 
     @IsNotEmpty()
     @IsString()
-    lastname: string;
+    last_name: string;
 
     @IsNotEmpty() 
     @IsEmail() 
@@ -20,12 +20,15 @@ import { IsEmail, IsNotEmpty, IsString } from "class-validator"
 }
 
 export interface UserLoginInterface { 
-    firstname: string,
-    lastname: string,
+    first_name: string,
+    last_name: string,
     email: string,
     hash: string
 }
 
+export interface UserInterface extends UserLoginInterface {
+    user_id: number
+}
 
 import { PartialType } from "@nestjs/mapped-types";
 

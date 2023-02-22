@@ -19,7 +19,7 @@ export class UserRepository {
     async signUp(data: UserLoginInterface) {
         const result = await this.db.table(this.TABLE_NAME)
                                     .insert(data)
-                                    .returning(['user_id', 'firstname', 'lastname', 'email'])
+                                    .returning(['user_id', 'first_name', 'last_name', 'email'])
         return result[0]
     }
 

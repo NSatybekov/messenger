@@ -6,8 +6,8 @@
     return knex.schema
         .createTable('users', function (table) {
             table.increments('user_id');
-            table.string('firstname', 255).notNullable();
-            table.string('lastname', 255).notNullable();
+            table.string('first_name', 255).notNullable();
+            table.string('last_name', 255).notNullable();
             table.string('email', 255).unique().notNullable()
             table.string('hash', 255)
         })

@@ -9,8 +9,9 @@
                   table.foreign('chat_id').references('chat.chat_id');
                     table.integer('user_id').index()
                     table.foreign('user_id').references('users.user_id');
-                        table.timestamp('joined_datetime').defaultTo(knex.fn.now());
-                        table.timestamp('left_datetime').defaultTo(null)
+                        table.timestamp('created_at').defaultTo(knex.fn.now());
+                        table.timestamp('left_at').defaultTo(null)
+                          table.string('role').defaultTo('member').checkIn(['member', 'admin'])
                })
   };
   

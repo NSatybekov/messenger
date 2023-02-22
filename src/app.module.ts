@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
-import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import {KnexModule} from 'nest-knexjs'
 import { Knex } from 'knex';
 import { UsersModule } from './users/users.module';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
+import { SwaggerModule } from '@nestjs/swagger';
 import { ChatMemberModule } from './chat_member/chat_member.module';
+
 
 @Module({
   imports: [
@@ -26,7 +27,6 @@ import { ChatMemberModule } from './chat_member/chat_member.module';
       }
     }),
     AuthModule, 
-    PrismaModule, 
     UsersModule,
     ConfigModule.forRoot({
       isGlobal: true
@@ -34,6 +34,7 @@ import { ChatMemberModule } from './chat_member/chat_member.module';
     MessageModule,
     ChatModule,
     ChatMemberModule,
+    SwaggerModule
   ]
 })
 export class AppModule {}

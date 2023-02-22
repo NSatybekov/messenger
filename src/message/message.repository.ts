@@ -11,7 +11,33 @@ export class MessageRepository  {
 
     async createMessage(messageData : MessageInterface) {
         const message = await this.db.table(this.TABLE_NAME).insert(messageData)
-                                                            .returning(['message_id', 'from_email', 'message_text'])
+                                                            .returning(['message_id', 'user_id', 'text', 'created_at', 'chat_id'])
         return message[0]
     }
+
+    async findMessageById(){
+
+    }
+
+    async findUserMessages(){ 
+
+    }
+
+    async findUserMessagesInChat(){
+        
+    }
+
+    async findChatMessages(){
+
+    
+    }
+
+    async editMessage(){
+
+    }
+
+    async deleteMessage(){
+
+    }
+
 }

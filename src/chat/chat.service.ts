@@ -1,47 +1,86 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ChatMemberRepository } from 'src/chat_member/chat_member.repository';
 import { UserRepository } from 'src/users/users.repository';
 import { ChatRepository } from './ chat.repository';
-import { ChatInterface, ChatNameDto } from './chat.entity';
+import { ChatInterface, ChatNameDto, ChatRegistryInterface } from './chat.entity';
 import { ChatMemberService } from 'src/chat_member/chat_member.service';
+import { UserInterface } from 'src/auth/dto';
+import { ChatMemberCreateInterface, ChatMemberInterface } from '../chat_member/chat_member.entity';
+import { Knex } from 'knex';
+
 
 @Injectable()
 export class ChatService {
     constructor(private readonly repository: ChatRepository, 
                 private readonly chatMemberService: ChatMemberService) {}
 
-    async findUserChats() {
-        // request in chat member to find all chat ids, and from this info get all chat names
-        // request in chat repository to find all chats with id that we get from group member
+    async findUserChats(user) {
+        const chatsInfo = await this.chatMemberService.getUserChats(user.user_id)
+        const chatIdArray = chatsInfo.map(chat => chat.chat_id)
+        return this.repository.findChatById(chatIdArray)
     }
 
-    async createSoloChat(chatName: ChatNameDto, admin) {
-        const chatData: ChatInterface = {
-            chat_name: chatName.chat_name,
-            admin_id: admin.user_id
-        }  
-        const chat = await this.createChat(chatData)
-        const chatMember = await this.chatMemberService.createChatMember(chat.chat_id, admin.user_id)
-        return {
-            chat,
-            chatMember
+    async createStandartChat(chatName: ChatNameDto, user, secondUserId) {
+        try{
+            const chatData: ChatRegistryInterface = {
+                name: chatName.name
+            }  
+            const chat = await this.createChat(chatData)
+            const chatMembers = await this.chatMemberService.createStandartChatMembers(chat.chat_id, user.user_id, secondUserId)
+            return {
+                chat,
+                chatMembers
+            }
+        } catch{
+            throw new HttpException('User not found try another one', 400)
         }
-        // post request in chat repository to create chat with chat name, admin id is user that created this chat? or without admin
-        // post request in chat member repository contact id for user that created chat from jwt token and new chat member from url? 
     }
 
-    async createGroupChat() {
-        // post request in chat repository to create chat with chat name, admin id is user that created this chat? or without admin
-        // in body we need to get all the emails or ids that needs to add to chat if some user not have email, chat will be created to rest of the users 
-        // same post request to create chat member
+    async createGroupChat(author: UserInterface, chatName: string, users: string[]) {
+        const trx = await this.repository.getTransaction()
+        try{
+            const chatData: ChatRegistryInterface = {name: chatName}  
+            const chat = await this.createChat(chatData, trx)
+                const userIds = users.map(userId => parseInt(userId))
+                    const usersData: ChatMemberCreateInterface[] = [
+                        {
+                            chat_id: chat.chat_id,
+                            user_id: author.user_id,
+                            role: 'admin' as const
+                        },
+                            ...userIds.map((userId) => ({ 
+                            chat_id: chat.chat_id,
+                            user_id: userId,
+                            role: 'member' as const, // as const needs to tell typescript use it as member if i will not use it there will be error, because it compile its to string by default
+                            }))
+                            ]
+                                    const chatMembers = await this.chatMemberService.createMultipleChatMembers(usersData, trx)
+                                        await trx.commit()
+                                        return chatMembers
+            } catch(error){
+                    await trx.rollback()
+                        throw new HttpException(error, 400)
+            }
     }
 
-    async createAdmin() {
-
+    async createChat(chatData : ChatRegistryInterface, trx?: Knex.Transaction) {
+        return this.repository.createChat(chatData, trx)
     }
 
-    async createChat(chatData : ChatInterface) {
-        return this.repository.createChat(chatData)
+    async findChatById(id: number) {
+        try{
+            return this.repository.findChatById(id)
+        } catch{
+            throw new HttpException('Error - chat not found try another id', 400)
+        }
+    }
+
+    async findChatByName(name: string) {
+        try{
+            return this.repository.findChantByName(name)
+        } catch{
+            throw new HttpException('Error - chat not found try another name', 400)
+        }
     }
 
 }
