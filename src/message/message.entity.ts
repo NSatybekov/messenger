@@ -8,13 +8,16 @@ import { IsEmail, IsNotEmpty, IsString } from "class-validator"
     text: string;
 }
 
-export interface MessageInterface { 
+export interface MessageCreateInterface { 
     user_id: number,
     text: string,
     chat_id: number
 }
 
-
+export interface MessageInterface extends MessageCreateInterface {
+    message_id: number,
+    created_at: Date
+}
 
 import { PartialType } from "@nestjs/mapped-types";
 

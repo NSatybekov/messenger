@@ -2,42 +2,42 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectModel } from 'nest-knexjs';
 import { UserLoginInterface } from 'src/auth/dto';
-import { MessageInterface } from './message.entity';
+import { MessageCreateInterface, MessageInterface } from './message.entity';
 
 @Injectable()
 export class MessageRepository  {
     private readonly TABLE_NAME = 'message'
     constructor(@InjectModel() private readonly db: Knex) {}
 
-    async createMessage(messageData : MessageInterface) {
+    async createMessage(messageData : MessageCreateInterface): Promise<MessageInterface> {
         const message = await this.db.table(this.TABLE_NAME).insert(messageData)
                                                             .returning(['message_id', 'user_id', 'text', 'created_at', 'chat_id'])
         return message[0]
     }
 
-    async findMessageById(){
-
+    async findMessageById(message_id: number): Promise<MessageInterface> {
+        const message = await this.db.select('*').table(this.TABLE_NAME).where({message_id})
+        return message[0]
     }
 
-    async findUserMessages(){ 
-
+    async findUserMessages(user_id: number): Promise<MessageInterface[]> { 
+        const messages = await this.db.select('*').table(this.TABLE_NAME).where({user_id})
+        return messages
     }
 
-    async findUserMessagesInChat(){
-        
+    async findUserMessagesInChat(user_id: number, chat_id: number): Promise<MessageInterface[]> {
+        const messages = await this.db.select('*').table(this.TABLE_NAME).where({user_id, chat_id})
+        return messages
     }
 
-    async findChatMessages(){
-
-    
+    async findChatMessages(chat_id: number) : Promise<MessageInterface[]> {
+        const messages = await this.db.select('*').table(this.TABLE_NAME).where({chat_id})
+        return messages
     }
 
-    async editMessage(){
-
-    }
-
-    async deleteMessage(){
-
+    async deleteMessage(message_id: number): Promise<boolean>{
+        const result = await this.db.table(this.TABLE_NAME).where({message_id}).delete()
+        return result > 0 ? true : false
     }
 
 }

@@ -1,14 +1,25 @@
 import { IsEmail, IsNotEmpty, IsString } from "class-validator"
 
- export class AuthDto {
-    @IsNotEmpty()
-    @IsString()
-    first_name: string;
+//  export class AuthDto {
+//     @IsNotEmpty()
+//     @IsString()
+//     first_name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    last_name: string;
+//     @IsNotEmpty()
+//     @IsString()
+//     last_name: string;
 
+//     @IsNotEmpty() 
+//     @IsEmail() 
+//     email: string;
+
+//     @IsNotEmpty() 
+//     @IsString() 
+//     password: string;
+
+// }
+
+export class SignInDto {
     @IsNotEmpty() 
     @IsEmail() 
     email: string;
@@ -16,7 +27,16 @@ import { IsEmail, IsNotEmpty, IsString } from "class-validator"
     @IsNotEmpty() 
     @IsString() 
     password: string;
+}
 
+export class SignUpDto extends SignInDto{
+    @IsNotEmpty()
+    @IsString()
+    first_name: string;
+
+    @IsNotEmpty()
+    @IsString()
+    last_name: string;
 }
 
 export interface UserLoginInterface { 
@@ -32,4 +52,4 @@ export interface UserInterface extends UserLoginInterface {
 
 import { PartialType } from "@nestjs/mapped-types";
 
-export class UpdateUserDto extends PartialType(AuthDto){}
+export class UpdateUserDto extends PartialType(SignUpDto){}

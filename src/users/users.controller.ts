@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtGuard } from 'src/auth/guard';
+import { GetUser } from 'src/auth/decorator';
+import { UserInterface, UserLoginInterface } from 'src/auth/dto';
 
 @Controller('/users')
 export class UsersController {
@@ -10,6 +12,12 @@ export class UsersController {
   @Get()
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('me') 
+  findMe(@GetUser() user: UserInterface) {
+    return this.usersService.findOne(user.user_id);
   }
 
   @UseGuards(JwtGuard)

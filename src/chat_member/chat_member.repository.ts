@@ -48,7 +48,7 @@ export class ChatMemberRepository {
           if (result > 0) {  
             return true; 
         } else {
-            return false;
+            return false; 
         }
       }
 
@@ -57,7 +57,7 @@ export class ChatMemberRepository {
         return result[0].role
       }
 
-      async isUserChatMember(user_id: number, chat_id: number) {
+      async findUserFromChat(user_id: number, chat_id: number) {
         const result = await this.db.table(this.TABLE_NAME).where({user_id, chat_id})
         return result
       }

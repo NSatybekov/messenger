@@ -1,11 +1,10 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Prisma } from "@prisma/client";
-import { AuthDto } from "./dto";
 import * as argon from 'argon2' //lib to hash password
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { UserLoginInterface } from './dto';
+import { SignInDto, SignUpDto, UserLoginInterface } from './dto';
 import { UserRepository } from 'src/users/users.repository';
 
 @Injectable()
@@ -15,7 +14,7 @@ export class AuthService{
                  private readonly config: ConfigService,
                  private repository: UserRepository) {
     }
-    async signup(dto: AuthDto) { // do i need to refer to signTokenInterface and create it?
+    async signup(dto: SignUpDto) { // do i need to refer to signTokenInterface and create it?
         const hash: string = await argon.hash(dto.password)
         const data: UserLoginInterface = {
             first_name: dto.first_name, 
@@ -32,7 +31,7 @@ export class AuthService{
           }
     }
 
-        async signin(dto: AuthDto) {
+        async signin(dto: SignInDto) {
         const email = dto.email
         const user = await this.repository.findUserByEmail(email)
 
@@ -56,7 +55,7 @@ export class AuthService{
         const secret = this.config.get('JWT_SECRET') // need to get it from .env
 
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '15m',
+            expiresIn: '1000 years',
             secret: secret
         })
 

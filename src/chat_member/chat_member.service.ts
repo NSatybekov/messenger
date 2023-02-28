@@ -113,4 +113,11 @@ export class ChatMemberService {
         }
     }
 
+    async isUserChatMember(user_id: number, chat_id: number): Promise<boolean>{
+        const result = await this.repository.findUserFromChat(user_id, chat_id)
+        if (result.length > 0) {
+            return true
+        }else return false
+    }
+
 }

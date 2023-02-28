@@ -7,12 +7,14 @@ import { ChatMemberService } from 'src/chat_member/chat_member.service';
 import { UserInterface } from 'src/auth/dto';
 import { ChatMemberCreateInterface, ChatMemberInterface } from '../chat_member/chat_member.entity';
 import { Knex } from 'knex';
+import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter'
 
 
 @Injectable()
 export class ChatService {
     constructor(private readonly repository: ChatRepository, 
-                private readonly chatMemberService: ChatMemberService) {}
+                private readonly chatMemberService: ChatMemberService
+                ) {}
 
     async findUserChats(user) {
         const chatsInfo = await this.chatMemberService.getUserChats(user.user_id)

@@ -6,7 +6,6 @@ import { InjectModel } from 'nest-knexjs';
 import { CreateUserDto} from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './users.repository';
-import { AuthDto } from 'src/auth/dto';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +27,7 @@ export class UsersService {
       return userWithoutHash
     }
     catch (err) {
-      throw new HttpException(err, HttpStatus.BAD_REQUEST);
+      throw new HttpException(err, HttpStatus.BAD_REQUEST); 
     }
   }
 
