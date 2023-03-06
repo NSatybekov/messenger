@@ -8,7 +8,9 @@ import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { ChatMemberModule } from './chat_member/chat_member.module';
-
+import { RedisModule } from './redis/redis.module';
+import { Redis } from 'ioredis'
+import { FriendsModule } from './friends/friends.module';
 
 
 @Module({
@@ -35,7 +37,10 @@ import { ChatMemberModule } from './chat_member/chat_member.module';
     MessageModule,
     ChatModule,
     ChatMemberModule,
-    SwaggerModule
-  ]
+    SwaggerModule,
+    FriendsModule,
+  ], providers: [
+    RedisModule
+  ],
 })
 export class AppModule {}

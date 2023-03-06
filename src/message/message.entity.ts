@@ -1,8 +1,10 @@
 
 
 import { IsEmail, IsNotEmpty, IsString } from "class-validator"
+import { ApiProperty } from "@nestjs/swagger";
 
  export class MessageDto {
+    @ApiProperty({example: 'test text message'})
     @IsNotEmpty() 
     @IsString() 
     text: string;
@@ -21,4 +23,8 @@ export interface MessageInterface extends MessageCreateInterface {
 
 import { PartialType } from "@nestjs/mapped-types";
 
-export class UpdateMessageDto extends PartialType(MessageDto){}
+export class UpdateMessageDto extends PartialType(MessageDto){
+    @ApiProperty({example: 'test text for update'})
+    text?: string
+
+}

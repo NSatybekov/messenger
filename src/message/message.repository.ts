@@ -40,4 +40,14 @@ export class MessageRepository  {
         return result > 0 ? true : false
     }
 
+    async isUserMessageAuthor(user_id, message_id){
+        const result = await this.db.table(this.TABLE_NAME).where({message_id, user_id})
+        return result.length > 0 ? true : false            
+    }
+
+    async updateMessage(message_id,messageText){
+        const result = await this.db.table(this.TABLE_NAME).where({message_id}).update({text: messageText})
+        return result > 0 ? true : false    
+    }
+
 }

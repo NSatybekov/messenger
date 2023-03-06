@@ -31,6 +31,5 @@ export class UserRepository {
     async findUserByEmail(email: string) { 
         const result = await this.db.table(this.TABLE_NAME)
                                     .where('email', email)
-        return result[0]
-    }
+        return result[0]    }
 }

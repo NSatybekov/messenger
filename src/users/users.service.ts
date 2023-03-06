@@ -1,16 +1,19 @@
 
 
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectModel } from 'nest-knexjs';
 import { CreateUserDto} from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/create-user.dto';
 import { UserRepository } from './users.repository';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel() private readonly knex: Knex,
-              private readonly repository: UserRepository) {}
+              private readonly repository: UserRepository,
+              @Inject('REDIS_CLIENT') private readonly redisClient: Redis
+              ) {}
 
   async  findAll() : Promise<object>  {
     const users = await this.repository.findAll();
