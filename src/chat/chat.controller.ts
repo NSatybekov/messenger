@@ -12,6 +12,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 export class ChatController { 
     constructor(private readonly ChatService: ChatService) {}
 
+    
     @ApiOperation({summary: 'Get list of all your chats'})
     @UseGuards(JwtGuard)
     @Get()

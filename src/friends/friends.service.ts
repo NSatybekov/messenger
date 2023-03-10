@@ -3,6 +3,8 @@ import { FriendsRepository } from './friends.repository';
 import { UserInterface, UserLoginInterface } from 'src/auth/dto';
 import { FriendRequestInterface, FriendInterface } from './friends.entity';
 import e from 'express';
+import { Knex } from 'knex';
+import { stat } from 'fs';
 
 @Injectable()
 export class FriendsService {
@@ -11,7 +13,7 @@ export class FriendsService {
   async sendFriendRequest(user: UserInterface, friend_id: number) {
     const friendship = await this.getFriendsInfo(user.user_id, friend_id);
     try {
-      if (!friendship ) {
+      if (!friendship && user.user_id!== friend_id) {
         const friendData: FriendRequestInterface = {
           user_id: user.user_id,
           friend_id,
@@ -30,7 +32,7 @@ export class FriendsService {
     return await this.repository.getFriendshipInfo(user_id, friend_id);
   }
 
-  async getFriendList(user: UserInterface) {
+  async getFriendList(user: UserInterface): Promise<FriendInterface[]> {
     return this.repository.getFriendList(user.user_id);
   }
 
@@ -51,7 +53,7 @@ export class FriendsService {
     }
   }
 
-  async deleteFriend(user: UserInterface, friend_id: number) {
+  async deleteFriend(user: UserInterface, friend_id: number, trx?: Knex.Transaction) {
     const friendship = await this.getFriendsInfo(user.user_id, friend_id)
     if(friendship) {
         return await this.repository.deleteFriend(user.user_id, friend_id)
@@ -62,12 +64,33 @@ export class FriendsService {
   }
 
   async blockUser(user: UserInterface, friend_id: number) {
+    const trx = await this.repository.getTransaction()
     try{
-        await this.repository.deleteFriend(user.user_id, friend_id)
-        const blocked = await this.repository.blockFriend(user.user_id, friend_id)
+        await this.repository.deleteFriend(user.user_id, friend_id, trx) // invoked directly so i will not get error if there is no friendship
+        const blocked = await this.repository.blockFriend(user.user_id, friend_id, trx)
+        await trx.commit()
         return blocked
     } catch{
+        await trx.rollback()
         throw new HttpException('Cannot block', 404)
     }
+  }
+
+  async blockStatus(requester_id: number, friend_id: number): Promise<boolean>{
+        const status = await this.repository.isUserBlockedByFriend(requester_id, friend_id)
+        if(status === 'BLOCKED'){
+            return true
+        }
+        else {
+            return false
+        }
+  }
+
+  async getReceivedFriendRequests(user: UserInterface){
+    return this.repository.getReceivedRequests(user.user_id)
+  }
+
+  async getSentFriendRequests(user: UserInterface){
+    return this.repository.getSentRequests(user.user_id)
   }
 }

@@ -11,6 +11,7 @@ import { ChatMemberModule } from './chat_member/chat_member.module';
 import { RedisModule } from './redis/redis.module';
 import { Redis } from 'ioredis'
 import { FriendsModule } from './friends/friends.module';
+import { PostsModule } from './posts/posts.module';
 
 
 @Module({
@@ -39,6 +40,7 @@ import { FriendsModule } from './friends/friends.module';
     ChatMemberModule,
     SwaggerModule,
     FriendsModule,
+    PostsModule,
   ], providers: [
     RedisModule
   ],

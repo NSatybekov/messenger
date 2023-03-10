@@ -2,7 +2,7 @@ import { Timestamp } from "rxjs"
 import { IsEnum, IsNotEmpty, IsNumber, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 
-type FriendRequestStatus = 'FRIEND' | 'BLOCKED' | 'SENT'
+export type FriendRequestStatus = 'FRIEND' | 'BLOCKED' | 'SENT'
 
 
 
