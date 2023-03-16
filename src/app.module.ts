@@ -12,24 +12,14 @@ import { RedisModule } from './redis/redis.module';
 import { Redis } from 'ioredis'
 import { FriendsModule } from './friends/friends.module';
 import { PostsModule } from './posts/posts.module';
-
+import { CommentsModule } from './comments/comments.module';
+import { AlertsModule } from './alerts/alerts.module';
+import { KafkaModule } from './kafka/kafka.module';
+import { knexConfig} from './config/knex.config'
 
 @Module({
   imports: [
-    KnexModule.forRoot({
-      config: {
-        client: 'pg',
-        version: '13',
-        useNullAsDefault: true,
-        connection: { 
-          host: '127.0.0.1',
-          user: 'postgres',
-          password: '123',
-          database: 'nest',
-          port: 5434
-        }
-      }
-    }),
+    KnexModule.forRoot(knexConfig),
     AuthModule, 
     UsersModule,
     ConfigModule.forRoot({
@@ -41,6 +31,9 @@ import { PostsModule } from './posts/posts.module';
     SwaggerModule,
     FriendsModule,
     PostsModule,
+    CommentsModule,
+    AlertsModule,
+    KafkaModule,
   ], providers: [
     RedisModule
   ],

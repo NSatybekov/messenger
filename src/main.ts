@@ -16,7 +16,7 @@ async function bootstrap() {
 
 if (cluster.isMaster) {//if (cluster.isMaster) block should only be executed once in the master process, which is responsible for forking the worker processes.
 //  In the master process, we don't want to call bootstrap() directly, because that would start a new NestJS application in the master proces 
-  const numWorkers = os.cpus().length;
+  const numWorkers = 4;
   console.log(`Number of workers ${numWorkers}`);
   for (let i = 0; i < numWorkers; i++) {
     cluster.fork();

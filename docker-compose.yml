@@ -1,12 +1,23 @@
 version: '3.8'
 
 services:
-  dev-db:
+  backend:
+    build: ./
+    container_name: social
+    restart: always
+    ports: 
+      - 3001:3001
+    environment:
+      - DB_HOST=db
+    depends_on:
+      - db
+    networks:
+      - local
+  db:
     image: postgres:13
     ports:
       - 5434:5432
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: nest
@@ -19,6 +30,26 @@ services:
       - 6379:6379
     networks:
       - local
+  
+  zookeeper:
+    image: 'wurstmeister/zookeeper'
+    container_name: zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - '2181:2181'
+  kafka:
+    image: 'wurstmeister/kafka'
+    container_name: kafka
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_HOST_NAME=localhost
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKAJS_NO_PARTITIONER_WARNING=1
+    ports:
+      - '9092:9092'
+    depends_on:
+      - zookeeper
 
 networks:
   local:

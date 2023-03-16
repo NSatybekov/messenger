@@ -78,7 +78,7 @@ export class FriendsService {
 
   async blockStatus(requester_id: number, friend_id: number): Promise<boolean>{
         const status = await this.repository.isUserBlockedByFriend(requester_id, friend_id)
-        if(status === 'BLOCKED'){
+        if(status && status.friend_status === 'BLOCKED'){
             return true
         }
         else {

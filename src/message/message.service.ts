@@ -1,4 +1,4 @@
-import { HttpException, Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { MessageRepository } from './message.repository';
 import { UserInterface, UserLoginInterface } from 'src/auth/dto';
 import {
@@ -11,6 +11,8 @@ import { UserRepository } from 'src/users/users.repository';
 import { ChatMemberService } from 'src/chat_member/chat_member.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Redis } from 'ioredis';
+import { ProducerService } from 'src/kafka/producer.service';
+import { ConsumerService } from 'src/kafka/consumer.service';
 
 @Injectable()
 export class MessageService {
@@ -19,6 +21,8 @@ export class MessageService {
     private repository: MessageRepository,
     private readonly chatMemberService: ChatMemberService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly kafkaProduce: ProducerService,
+    private readonly consumerService: ConsumerService
   ) {}
 
   async sendMessage(user: UserInterface, message: MessageDto, chat_id: number) {
@@ -33,6 +37,7 @@ export class MessageService {
         chat_id: chat_id,
       };
       const result = await this.createMessage(messageData);
+      await this.sendMessageToKafka(messageData.text, user.user_id)
       this.redisClient.publish(`newMessage_${chat_id}`, JSON.stringify(result));
       return result;
     } else {
@@ -52,6 +57,15 @@ export class MessageService {
       await this.redisClient.set(`chat:${chat_id}`, JSON.stringify(messages));
     }
     return result;
+  }
+
+
+  async sendMessageToKafka(text: string, userId){
+    const idString = await userId.toString()
+    this.kafkaProduce.produce({ 
+      topic: 'Created_message',
+      messages: [{key: idString, value: text}]
+    })
   }
 
   async findUserMessagesInChat(user: UserInterface, chat_id: number) {

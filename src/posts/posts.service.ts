@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { stat } from 'fs';
 import { UserInterface } from 'src/auth/dto';
 import { FriendsService } from 'src/friends/friends.service';
+import { ProducerService } from 'src/kafka/producer.service';
 import { PostCreateInterface, PostInterface } from './posts.entity';
 import { PostsRepository } from './posts.repository';
 
@@ -10,6 +11,7 @@ export class PostsService {
   constructor(
     private readonly repository: PostsRepository,
     private readonly friendService: FriendsService,
+    private readonly kafkaProduce: ProducerService
   ) {}
 
   async createPost(
@@ -24,10 +26,23 @@ export class PostsService {
         text: postText,
       };
       const post = await this.repository.createPost(postData);
+      await this.produceToKafka(postText, user.user_id)
       return post;
     } catch {
       throw new HttpException('Cannot create', 404);
     }
+  }
+
+  async createPostToDb(postData: PostCreateInterface){
+    return this.repository.createPost(postData)
+  } 
+
+  async produceToKafka(postText: string, userId): Promise<void>{
+  const idString = await userId.toString()
+    this.kafkaProduce.produce({ 
+      topic: 'Created_post',
+      messages: [{key: idString, value: postText}]
+    })
   }
 
   async getUserPosts(user_id: number): Promise<PostInterface[]> {
@@ -97,5 +112,9 @@ export class PostsService {
     } catch {
       throw new HttpException('Something wrong', 404);
     }
+  }
+
+  async getPostInfoById(post_id: number): Promise<PostInterface>{
+    return this.repository.findPostById(post_id)
   }
 }

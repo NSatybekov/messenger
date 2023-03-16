@@ -6,12 +6,15 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { PostCreateInterface, PostInterface, PostDto, UpdatePostDto } from './posts.entity';
 import { PostsService } from './posts.service';
 import { User } from '@prisma/client';
+import { HandlerChatPost } from './chatpost.handler';
 
 @ApiBearerAuth()
 @ApiTags('posts')
 @Controller('posts')
 export class PostsController {
-    constructor(private readonly postsService: PostsService){}
+    constructor(private readonly postsService: PostsService,
+                private readonly postHandler: HandlerChatPost
+        ){}
 
     @UseGuards(JwtGuard)
     @Post()

@@ -4,12 +4,14 @@ import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { UserInterface, UserLoginInterface } from 'src/auth/dto';
 import { MessageDto, MessageInterface } from './message.entity';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { interval, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {MessageCreateInterface} from './message.entity'
 import { Redis } from 'ioredis';
+import { HandlerWelcomeMessage } from './welcome.handler';
+
 
 @ApiBearerAuth()
 @ApiTags('messages')
@@ -18,7 +20,8 @@ export class MessageController {
     constructor(private readonly messageService: MessageService,
       private readonly eventEmitter: EventEmitter2,
       @Inject('REDIS_CLIENT')
-      private readonly redisClient: Redis
+      private readonly redisClient: Redis,
+      private readonly messageHandler: HandlerWelcomeMessage
       ) {}
 
     @UseGuards(JwtGuard)
@@ -33,7 +36,7 @@ export class MessageController {
           return this.messageService.findUserMessagesInChat(user,chat_id)
         }
     
-
+      @ApiParam({name: 'chatId', description:' Chat id'})
       @UseGuards(JwtGuard)
       @Post()
       sendMessage(@GetUser() user: UserInterface, @Body() message: MessageDto, @Param('chatId') chat_id) {

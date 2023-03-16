@@ -5,9 +5,13 @@ import { PostsRepository } from './posts.repository';
 import { FriendsService } from 'src/friends/friends.service';
 import { FriendsModule } from 'src/friends/friends.module';
 import { FriendsRepository } from 'src/friends/friends.repository';
+import { KafkaModule } from 'src/kafka/kafka.module';
+import { HandlerChatPost } from './chatpost.handler';
 
 @Module({
-  providers: [PostsService, PostsRepository, FriendsService, FriendsRepository],
+  providers: [PostsService, PostsRepository, FriendsService, FriendsRepository, KafkaModule, HandlerChatPost],
   controllers: [PostsController],
+  exports: [PostsService],
+  imports: [KafkaModule]
 })
 export class PostsModule {}

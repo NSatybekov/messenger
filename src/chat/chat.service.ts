@@ -8,12 +8,14 @@ import { UserInterface } from 'src/auth/dto';
 import { ChatMemberCreateInterface, ChatMemberInterface } from '../chat_member/chat_member.entity';
 import { Knex } from 'knex';
 import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter'
+import { ProducerService } from 'src/kafka/producer.service';
 
 
 @Injectable()
 export class ChatService {
     constructor(private readonly repository: ChatRepository, 
-                private readonly chatMemberService: ChatMemberService
+                private readonly chatMemberService: ChatMemberService,
+                private readonly kafkaProduce: ProducerService
                 ) {}
 
     async findUserChats(user) {
@@ -29,6 +31,7 @@ export class ChatService {
             }  
             const chat = await this.createChat(chatData)
             const chatMembers = await this.chatMemberService.createStandartChatMembers(chat.chat_id, user.user_id, secondUserId)
+            await this.createChatKakfa(chat.chat_id,user.user_id, chat.name)
             return {
                 chat,
                 chatMembers
@@ -36,6 +39,15 @@ export class ChatService {
         } catch{
             throw new HttpException('User not found try another one', 400)
         }
+    }
+
+    async createChatKakfa(chatId: number, userId: number, chatName: string){
+        const messageValue = JSON.stringify({chatName: chatName, userId: userId})
+        const chatIdString = chatId.toString()
+        this.kafkaProduce.produce({
+            topic: 'chat_created',
+            messages: [{key: chatIdString, value: messageValue}]
+        })
     }
 
     async createGroupChat(author: UserInterface, chatName: string, users: string[]) {
@@ -65,7 +77,7 @@ export class ChatService {
             }
     }
 
-    async createChat(chatData : ChatRegistryInterface, trx?: Knex.Transaction) {
+    async createChat(chatData : ChatRegistryInterface, trx?: Knex.Transaction): Promise<ChatInterface> {
         return this.repository.createChat(chatData, trx)
     }
 

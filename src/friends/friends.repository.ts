@@ -40,7 +40,7 @@ export class FriendsRepository {
 
 
     async deleteFriend(user_id: number, friend_id: number, trx?: Knex.Transaction){
-        const result = await (trx || this.db).select('*').table(this.TABLE_NAME)
+        const result = await (trx || this.db).table(this.TABLE_NAME)
                                                 .where({ user_id, friend_id })
                                                 .orWhere({ user_id: friend_id, friend_id: user_id })
                                                 .delete()
@@ -57,11 +57,11 @@ export class FriendsRepository {
         return this.db.transaction();
       }
     
-    async isUserBlockedByFriend(requester_id: number, blocker_id: number) : Promise <FriendRequestStatus>{
+    async isUserBlockedByFriend(requester_id: number, blocker_id: number) : Promise <FriendInterface>{
         const result = await this.db.select('friend_status').table(this.TABLE_NAME)
                                                 .where({ user_id : blocker_id, friend_id: requester_id })
                                                 .first()
-        return result.friend_status   
+        return result
     }
 
     async getSentRequests(user_id: number): Promise<FriendInterface[]>{
