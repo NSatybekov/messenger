@@ -4,7 +4,7 @@ import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { ChatNameDto, ChatRegistryInterface } from './chat.entity';
 import { ChatService } from './chat.service';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiParam } from '@nestjs/swagger'
 
 @ApiBearerAuth()
 @ApiTags('chat')
@@ -29,6 +29,7 @@ export class ChatController {
         return result;
       }
 
+    @ApiParam({ name: 'id', description: ' users id to start chat with' })
     @ApiOperation({summary: 'Create 1 one 1 chat with another user, it"s stupid to make chat name in solo chat but will change it later, would be better if i separated solo chats'})
     @UseGuards(JwtGuard)
     @Post(':id')
@@ -36,6 +37,7 @@ export class ChatController {
         return this.ChatService.createStandartChat(chatName, user, secondUserId)
     }
 
+    @ApiParam({ name: 'id', description: ' post id' })
     @ApiOperation({summary: 'find chat by id'})
     @UseGuards(JwtGuard)
     @Get(`:id`)

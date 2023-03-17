@@ -3,7 +3,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Sse, Messag
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { UserInterface, UserLoginInterface } from 'src/auth/dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiParam } from '@nestjs/swagger'
 import { channel } from 'diagnostics_channel';
 import { Redis } from 'ioredis';
 
@@ -35,6 +35,7 @@ export class FriendsController {
     }
 
 
+    @ApiParam({ name: 'id', description: ' another users id' })
     @ApiOperation({summary: 'Create friend request - to get users list make get request to users endpoint'})
     @UseGuards(JwtGuard)
     @Post(':id')
@@ -42,6 +43,7 @@ export class FriendsController {
         return this.friendsService.sendFriendRequest(user, friend_id)
     }
 
+    @ApiParam({ name: 'id', description: ' another users id' })
     @ApiOperation({summary: 'Accept friends requests - you can get list of friend requests from'})
     @UseGuards(JwtGuard)
     @Put(':id')
@@ -49,6 +51,7 @@ export class FriendsController {
         return this.friendsService.acceptFriendRequest(user, friend_id)
     }
 
+    @ApiParam({ name: 'id', description: ' another users id' })
     @ApiOperation({summary: 'Delete friend'})
     @UseGuards(JwtGuard)
     @Delete(':id')
@@ -56,6 +59,7 @@ export class FriendsController {
         return this.friendsService.deleteFriend(user, friend_id)
     }
 
+    @ApiParam({ name: 'id', description: ' another users id' })
     @ApiOperation({summary: 'Block user'})
     @UseGuards(JwtGuard)
     @Post(':id/block')

@@ -1,6 +1,7 @@
 import { Timestamp } from "rxjs"
 import { IsEnum, IsNotEmpty, IsNumber, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
+import { ApiProperty } from "@nestjs/swagger"
 
 
 
@@ -18,6 +19,7 @@ export class RoleDTO{
 }
 
  export class ChatMemberDTO extends RoleDTO{
+   @ApiProperty({example: 'any number from users list'})
    @IsNotEmpty()
    user_id: number;
 

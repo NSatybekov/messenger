@@ -10,7 +10,7 @@ export const knexConfig: KnexModuleOptions = {
           user: 'postgres', 
           password: '123',
           database: 'nest',
-          port: 5434,
+          port: 5432,
         },
         migrations: {
           directory: './migrations'

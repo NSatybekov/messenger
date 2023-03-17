@@ -17,7 +17,7 @@ export class HandlerChatPost implements OnModuleInit {
                   const chatId =  parseInt(message.key.toString())
                   const kafkaMessageData = JSON.parse(message.value.toString())
                   const postData: PostCreateInterface = {
-                    name: `This postname based on this chats name: ${kafkaMessageData.chatName} `,
+                    name: `This post name: ${kafkaMessageData.chatName} `,
                     user_id: parseInt(kafkaMessageData.userId),
                     text: `This is posts text to test how it will work - name of chat:${kafkaMessageData.chatName} `
                   }

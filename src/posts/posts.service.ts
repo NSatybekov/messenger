@@ -1,6 +1,7 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { stat } from 'fs';
 import { UserInterface } from 'src/auth/dto';
+import { CommentsService } from 'src/comments/comments.service';
 import { FriendsService } from 'src/friends/friends.service';
 import { ProducerService } from 'src/kafka/producer.service';
 import { PostCreateInterface, PostInterface } from './posts.entity';
@@ -11,7 +12,9 @@ export class PostsService {
   constructor(
     private readonly repository: PostsRepository,
     private readonly friendService: FriendsService,
-    private readonly kafkaProduce: ProducerService
+    private readonly kafkaProduce: ProducerService,
+    @Inject(forwardRef(() => CommentsService))
+    private readonly commentService: CommentsService,
   ) {}
 
   async createPost(
@@ -26,23 +29,23 @@ export class PostsService {
         text: postText,
       };
       const post = await this.repository.createPost(postData);
-      await this.produceToKafka(postText, user.user_id)
+      await this.produceToKafka(postText, user.user_id);
       return post;
     } catch {
       throw new HttpException('Cannot create', 404);
     }
   }
 
-  async createPostToDb(postData: PostCreateInterface){
-    return this.repository.createPost(postData)
-  } 
+  async createPostToDb(postData: PostCreateInterface) {
+    return this.repository.createPost(postData);
+  }
 
-  async produceToKafka(postText: string, userId): Promise<void>{
-  const idString = await userId.toString()
-    this.kafkaProduce.produce({ 
+  async produceToKafka(postText: string, userId): Promise<void> {
+    const idString = await userId.toString();
+    this.kafkaProduce.produce({
       topic: 'Created_post',
-      messages: [{key: idString, value: postText}]
-    })
+      messages: [{ key: idString, value: postText }],
+    });
   }
 
   async getUserPosts(user_id: number): Promise<PostInterface[]> {
@@ -99,22 +102,49 @@ export class PostsService {
 
   async getFeedPosts(user: UserInterface) {
     const friendList = await this.friendService.getFriendList(user);
-    const sentList = await this.friendService.getSentFriendRequests(user)
+    const sentList = await this.friendService.getSentFriendRequests(user);
     try {
-      const sentIds = sentList.map((sent) => sent.friend_id)
+      const sentIds = sentList.map((sent) => sent.friend_id);
       const allIds = friendList.flatMap((friend) => {
         const arrayAll = [friend.friend_id, friend.user_id]; // create array that will flat (join) this small arrays that contain friend id and user id
         return arrayAll;
       });
       const userIds = Array.from(new Set(allIds)); // create set to get unique values only so i will not get duplicate posts
-      const allUserIds = userIds.concat(sentIds)
+      const allUserIds = userIds.concat(sentIds);
       return this.repository.getFeedPosts(allUserIds);
     } catch {
       throw new HttpException('Something wrong', 404);
     }
   }
 
-  async getPostInfoById(post_id: number): Promise<PostInterface>{
-    return this.repository.findPostById(post_id)
+  async getPostInfoById(post_id: number): Promise<PostInterface> {
+    return this.repository.findPostById(post_id);
+  }
+
+  async findPostByText(user: UserInterface, text: string) {
+    try {
+      const posts = await this.repository.findPostByText(text);
+      const comments = await this.commentService.findCommentsByText(text);
+      const postIdsFromComment = comments.map((comment) => comment.post_id);
+      const postsFromComments = await this.repository.findPostsByIdsArray(postIdsFromComment);
+      const allPosts = postsFromComments.concat(posts)
+      const filteredPosts = [];
+      for (const post of allPosts) {
+        const isBlocked = await this.friendService.blockStatus(
+          user.user_id,
+          post.user_id,
+        );
+        if (!isBlocked) {
+          filteredPosts.push(post);
+        }
+      } // probably better to get data from DB already without users from block list to optimize it
+      return {
+        posts,
+        postsFromComments,
+        filteredPosts
+      };
+    } catch {
+      throw new HttpException('No such post', 404);
+    }
   }
 }

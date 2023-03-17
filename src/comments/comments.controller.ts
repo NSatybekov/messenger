@@ -4,7 +4,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Sse, Messag
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
 import { UserInterface, UserLoginInterface } from 'src/auth/dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiTags , ApiParam } from '@nestjs/swagger'
 import { CommentCreateInterface, CommentInterface, CommentDto, UpdateCommentDto } from './comments.entity';
 import { CommentsService } from './comments.service';
 
@@ -15,6 +15,7 @@ export class CommentsController {
     constructor(private readonly commentService: CommentsService){}
 
 
+    @ApiParam({ name: 'postId', description: ' post id' })
     @ApiOperation({summary: 'Get list of post comments'})
     @UseGuards(JwtGuard)
     @Get()
@@ -22,6 +23,7 @@ export class CommentsController {
         return this.commentService.getPostComments(user, post_id)
     }
 
+    @ApiParam({ name: 'postId', description: ' post id' })
     @ApiOperation({summary: 'create new comment'})
     @UseGuards(JwtGuard)
     @Post('')
@@ -29,6 +31,7 @@ export class CommentsController {
         return this.commentService.addComment(user, post_id, body.text)
     }
 
+    @ApiParam({ name: 'postId', description: ' post id' })
     @ApiOperation({summary: 'edit comment'})
     @UseGuards(JwtGuard)
     @Put(':id')
@@ -36,6 +39,7 @@ export class CommentsController {
         return this.commentService.editComment(user, comment_id, body.text)
     }
 
+    @ApiParam({ name: 'id', description: ' comment id' })
     @ApiOperation({summary: 'delete your comment or in your post'})
     @UseGuards(JwtGuard)
     @Delete(':id')

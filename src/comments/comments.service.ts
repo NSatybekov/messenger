@@ -1,17 +1,18 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
 import { use } from 'passport';
 import { async } from 'rxjs';
 import { UserInterface } from 'src/auth/dto';
 import { FriendsService } from 'src/friends/friends.service';
 import { PostInterface } from 'src/posts/posts.entity';
 import { PostsService } from 'src/posts/posts.service';
-import { CommentCreateInterface } from './comments.entity';
+import { CommentCreateInterface, CommentInterface } from './comments.entity';
 import { CommentsRepository } from './comments.repository';
 
 @Injectable()
 export class CommentsService {
     constructor(private readonly repository: CommentsRepository,
                 private readonly friendService: FriendsService,
+                @Inject(forwardRef(() => PostsService))
                 private readonly postService: PostsService
         ){}
 
@@ -100,5 +101,9 @@ export class CommentsService {
         const commentInfo = await this.repository.getCommentById(comment_id)
         const postInfo = await this.postService.getPostInfoById(commentInfo.post_id)
         return postInfo
+    }
+
+    async findCommentsByText(text: string): Promise<CommentInterface[]>{
+        return this.repository.findCommentByText(text)
     }
 }

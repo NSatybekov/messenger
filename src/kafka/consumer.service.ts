@@ -27,6 +27,7 @@ export class ConsumerService implements OnApplicationShutdown {
         catch(err){
             const logger = this.kafka.logger()
             logger.error(`Failed to consume message from topic ${topics}`)
+            console.log(`Failed to consume message from topic ${topics}`)
         }
         this.consumers.push(consumer)
     }

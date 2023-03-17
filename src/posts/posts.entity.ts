@@ -16,6 +16,14 @@ import { ApiProperty } from "@nestjs/swagger";
 
 }
 
+export class SearchPostDto {
+    @ApiProperty({example: 'any string to search'})
+    @IsNotEmpty() 
+    @IsString() 
+    text: string;
+
+}
+
 export interface PostCreateInterface { 
     user_id: number,
     text: string,
