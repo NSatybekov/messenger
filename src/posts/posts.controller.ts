@@ -5,7 +5,6 @@ import { UserInterface, UserLoginInterface } from 'src/auth/dto';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiParam } from '@nestjs/swagger'
 import { PostCreateInterface, PostInterface, PostDto, UpdatePostDto, SearchPostDto } from './posts.entity';
 import { PostsService } from './posts.service';
-import { User } from '@prisma/client';
 import { HandlerChatPost } from './chatpost.handler';
 
 @ApiBearerAuth()
@@ -67,4 +66,5 @@ export class PostsController {
     searchByText(@GetUser() user: UserInterface, @Body() body: SearchPostDto){
          return this.postsService.findPostByText(user, body.text)
     }    
+
 }   

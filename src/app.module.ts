@@ -16,6 +16,7 @@ import { CommentsModule } from './comments/comments.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { KafkaModule } from './kafka/kafka.module';
 import { knexConfig} from './config/knex.config'
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { knexConfig} from './config/knex.config'
     CommentsModule,
     AlertsModule,
     KafkaModule,
+    SearchModule,
   ], providers: [
     RedisModule
   ],

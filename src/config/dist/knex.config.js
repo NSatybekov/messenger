@@ -11,7 +11,7 @@ exports.knexConfig = {
             user: 'postgres',
             password: '123',
             database: 'nest',
-            port: 5432
+            port: 5434
         },
         migrations: {
             directory: './migrations'

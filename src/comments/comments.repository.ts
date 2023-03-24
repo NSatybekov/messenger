@@ -47,7 +47,12 @@ export class CommentsRepository {
 
     async findCommentByText(text: string): Promise<CommentInterface[]>{
         const result = await this.db.select('*').table(this.TABLE_NAME)
-                                                .where(this.db.raw('text ilike ?', `%${text}%`))
+                                                .where(this.db.raw('text ilike ?', `%${text}%`)).limit(30)
+        return result
+    }
+
+    async getAllComments(): Promise<CommentInterface[]>{
+        const result = await this.db.select('*').table(this.TABLE_NAME)
         return result
     }
 

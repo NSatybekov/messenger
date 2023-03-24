@@ -6,6 +6,8 @@ import { FriendsService } from 'src/friends/friends.service';
 import { ProducerService } from 'src/kafka/producer.service';
 import { PostCreateInterface, PostInterface } from './posts.entity';
 import { PostsRepository } from './posts.repository';
+import * as faker from 'faker';
+
 
 @Injectable()
 export class PostsService {
@@ -29,22 +31,35 @@ export class PostsService {
         text: postText,
       };
       const post = await this.repository.createPost(postData);
-      await this.produceToKafka(postText, user.user_id);
+      await this.produceToKafka(post);
       return post;
     } catch {
       throw new HttpException('Cannot create', 404);
     }
   }
 
+  // async seed() {
+  //   const totalUsers = 101;
+  //   for (let i = 0; i < 500000; i++) {
+  //     const user_id = faker.datatype.number({min: 1, max: totalUsers});
+  //     const postName = faker.lorem.words().slice(0, 50);;
+  //     const postText = faker.lorem.paragraphs().slice(0, 1000);
+  //     await this.createPost( user_id,  postName, postText );
+  //   }
+  // }
+
   async createPostToDb(postData: PostCreateInterface) {
     return this.repository.createPost(postData);
   }
 
-  async produceToKafka(postText: string, userId): Promise<void> {
-    const idString = await userId.toString();
+  async produceToKafka(postData: PostInterface): Promise<void> {
+    const idString = await postData.post_id.toString();
+    const dataToKafka = JSON.stringify(postData)
     this.kafkaProduce.produce({
-      topic: 'Created_post',
-      messages: [{ key: idString, value: postText }],
+      topic: 'created_post',
+      messages: [{ 
+        key: idString,
+        value: dataToKafka }],
     });
   }
 
@@ -128,23 +143,16 @@ export class PostsService {
       const postIdsFromComment = comments.map((comment) => comment.post_id);
       const postsFromComments = await this.repository.findPostsByIdsArray(postIdsFromComment);
       const allPosts = postsFromComments.concat(posts)
-      const filteredPosts = [];
-      for (const post of allPosts) {
-        const isBlocked = await this.friendService.blockStatus(
-          user.user_id,
-          post.user_id,
-        );
-        if (!isBlocked) {
-          filteredPosts.push(post);
-        }
-      } // probably better to get data from DB already without users from block list to optimize it
+    // probably better to get data from DB already without users from block list to optimize it
       return {
-        posts,
-        postsFromComments,
-        filteredPosts
+        allPosts
       };
     } catch {
       throw new HttpException('No such post', 404);
     }
+  }
+
+  async getAllPostsList(): Promise<PostInterface[]>{
+    return this.repository.getAllPosts()
   }
 }

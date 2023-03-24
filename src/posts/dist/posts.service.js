@@ -70,7 +70,7 @@ var PostsService = /** @class */ (function () {
                         return [4 /*yield*/, this.repository.createPost(postData)];
                     case 1:
                         post = _b.sent();
-                        return [4 /*yield*/, this.produceToKafka(postText, user.user_id)];
+                        return [4 /*yield*/, this.produceToKafka(post.text, post.name, post.post_id, user.user_id)];
                     case 2:
                         _b.sent();
                         return [2 /*return*/, post];
@@ -89,17 +89,25 @@ var PostsService = /** @class */ (function () {
             });
         });
     };
-    PostsService.prototype.produceToKafka = function (postText, userId) {
+    PostsService.prototype.produceToKafka = function (postText, postName, postId, user_id) {
         return __awaiter(this, void 0, Promise, function () {
-            var idString;
+            var idString, dataToKafka;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, userId.toString()];
+                    case 0: return [4 /*yield*/, postId.toString()];
                     case 1:
                         idString = _a.sent();
+                        dataToKafka = JSON.stringify({
+                            postText: postText,
+                            postName: postName,
+                            user_id: user_id
+                        });
                         this.kafkaProduce.produce({
-                            topic: 'Created_post',
-                            messages: [{ key: idString, value: postText }]
+                            topic: 'created_post',
+                            messages: [{
+                                    key: idString,
+                                    value: dataToKafka
+                                }]
                         });
                         return [2 /*return*/];
                 }

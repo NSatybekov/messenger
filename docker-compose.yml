@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  backend:
-    build: ./
-    container_name: social
-    restart: always
-    ports: 
-      - 3001:3001
-    environment:
-      - DB_HOST=db
-    depends_on:
-      - db
-    networks:
-      - local
   db:
     image: postgres:13
     ports:
@@ -21,6 +9,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: nest
+    volumes:
+      - /Users/nsatybekov/docker/pg_data:/var/lib/postgresql/data
     networks:
       - local
 
@@ -46,10 +36,26 @@ services:
       - KAFKA_ADVERTISED_HOST_NAME=localhost
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKAJS_NO_PARTITIONER_WARNING=1
+    volumes:
+      - /Users/nsatybekov/docker/kafka_data:/kafka
     ports:
       - '9092:9092'
     depends_on:
       - zookeeper
-
+  search:
+    container_name: search
+    image: elasticsearch:7.14.0
+    restart: unless-stopped
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    volumes:
+      - /Users/nsatybekov/docker/search_data:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - http.max_content_length=1000mb
+      - http.read_timeout=15m
+    networks:
+      - local
 networks:
   local:

@@ -12,6 +12,11 @@ export class AuthController{
         return this.authService.signup(dto)
     }
 
+    // @Post('random')
+    // random(@Body() dto: SignUpDto) {
+    //     return this.authService.createRandomUsers()
+    // }
+
     @HttpCode(HttpStatus.OK) // needs to change http code that returns to user
     @Post('signin')
     signin(@Body() dto: SignInDto) {

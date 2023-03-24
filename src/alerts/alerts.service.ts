@@ -10,7 +10,7 @@ export class AlertsService {
     }
 
     async onModuleInit() {
-        await this.consumerService.consume('alerts_group',{topics: ['Created_post', 'Created_message', 'chat_created']}, {
+        await this.consumerService.consume('alerts_group',{topics: ['created_post', 'Created_message', 'chat_created', 'created_comment']}, {
             eachMessage: async ({topic, partition, message}) => {
                 console.log({
                     message: message.value.toString(),

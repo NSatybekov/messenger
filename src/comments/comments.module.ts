@@ -4,11 +4,12 @@ import { CommentsController } from './comments.controller';
 import { CommentsRepository } from './comments.repository';
 import { PostsModule } from 'src/posts/posts.module';
 import { FriendsModule } from 'src/friends/friends.module';
+import { KafkaModule } from 'src/kafka/kafka.module';
 
 @Module({
-  providers: [CommentsService, CommentsRepository, ],
+  providers: [CommentsService, CommentsRepository, KafkaModule ],
   controllers: [CommentsController],
   exports: [CommentsService],
-  imports: [FriendsModule, forwardRef(()=> PostsModule)]
+  imports: [FriendsModule, forwardRef(()=> PostsModule), KafkaModule]
 })
 export class CommentsModule {}

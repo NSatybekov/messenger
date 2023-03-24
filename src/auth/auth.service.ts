@@ -1,11 +1,10 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { Prisma } from "@prisma/client";
 import * as argon from 'argon2' //lib to hash password
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { SignInDto, SignUpDto, UserLoginInterface } from './dto';
 import { UserRepository } from 'src/users/users.repository';
+import * as faker from 'faker'
 
 @Injectable()
 export class AuthService{
@@ -14,6 +13,24 @@ export class AuthService{
                  private readonly config: ConfigService,
                  private repository: UserRepository) {
     }
+
+  async createRandomUsers(): Promise<void> {
+    for (let i = 0; i < 100; i++) {
+      const firstName = faker.name.firstName();
+      const lastName = faker.name.lastName();
+      const email = faker.internet.email(firstName, lastName);
+      const password = faker.internet.password();
+
+      const dto: SignUpDto = {
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        password: password,
+      };
+
+      await this.signup(dto);
+    }
+  }
     async signup(dto: SignUpDto) { // do i need to refer to signTokenInterface and create it?
         const hash: string = await argon.hash(dto.password)
         const data: UserLoginInterface = {
@@ -24,7 +41,6 @@ export class AuthService{
         }
         try{ 
             const user = await this.repository.signUp(data);  // do i need to refer what type of value (interface) need to contain this function from repo? 
-
             return this.signToken(user.user_id, user.email)
         } catch (err) {
             throw new HttpException(err, HttpStatus.BAD_REQUEST);

@@ -17,17 +17,17 @@ export class PostsRepository {
 
 
     async findUserPosts(user_id: number):  Promise<PostInterface[]> {
-        const posts = await this.db.select('*').table(this.TABLE_NAME).where({user_id})
+        const posts = await this.db.select('*').table(this.TABLE_NAME).where({user_id}).limit(30)
         return posts
     }
 
     async findPostById(post_id: number): Promise<PostInterface>{
-        const post = await this.db.select('*').table(this.TABLE_NAME).where({post_id})
+        const post = await this.db.select('*').table(this.TABLE_NAME).where({post_id}).limit(30)
         return post[0]
     }
 
     async findPostsByIdsArray(post_ids: number[]): Promise<PostInterface[]>{
-        const posts = await this.db.select('*').table(this.TABLE_NAME).whereIn('post_id', post_ids)
+        const posts = await this.db.select('*').table(this.TABLE_NAME).whereIn('post_id', post_ids).limit(30)
         return posts
     }
 
@@ -56,7 +56,12 @@ export class PostsRepository {
         const result = await this.db.select('*').table(this.TABLE_NAME)
                                                 .where(this.db.raw('name ilike ?', `%${text}%`))
                                                 .orWhere(this.db.raw('text ilike ?', `%${text}%`))
+                                                .limit(30)
         return result
     }
 
+    async getAllPosts(): Promise<PostInterface[]>{
+        const result = await this.db.select('*').table(this.TABLE_NAME)
+        return result
+    }
 }
