@@ -14,21 +14,13 @@ import {
 } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
-import { UserInterface, UserLoginInterface } from 'src/auth/dto';
-import { MessageDto, MessageInterface } from './message.entity';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { interval, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { MessageCreateInterface } from './message.entity';
+import { UserInterface } from 'src/auth/dto';
+import { MessageDto } from './message.entity';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Observable } from 'rxjs';
 import { Redis } from 'ioredis';
 import { HandlerWelcomeMessage } from './welcome.handler';
-
 
 @ApiBearerAuth()
 @ApiTags('messages')

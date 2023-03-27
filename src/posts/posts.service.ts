@@ -1,13 +1,10 @@
 import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
-import { stat } from 'fs';
 import { UserInterface } from 'src/auth/dto';
 import { CommentsService } from 'src/comments/comments.service';
 import { FriendsService } from 'src/friends/friends.service';
 import { ProducerService } from 'src/kafka/producer.service';
 import { PostCreateInterface, PostInterface } from './posts.entity';
 import { PostsRepository } from './posts.repository';
-import * as faker from 'faker';
-
 
 @Injectable()
 export class PostsService {
@@ -54,12 +51,15 @@ export class PostsService {
 
   async produceToKafka(postData: PostInterface): Promise<void> {
     const idString = await postData.post_id.toString();
-    const dataToKafka = JSON.stringify(postData)
+    const dataToKafka = JSON.stringify(postData);
     this.kafkaProduce.produce({
       topic: 'created_post',
-      messages: [{ 
-        key: idString,
-        value: dataToKafka }],
+      messages: [
+        {
+          key: idString,
+          value: dataToKafka,
+        },
+      ],
     });
   }
 
@@ -141,18 +141,20 @@ export class PostsService {
       const posts = await this.repository.findPostByText(text);
       const comments = await this.commentService.findCommentsByText(text);
       const postIdsFromComment = comments.map((comment) => comment.post_id);
-      const postsFromComments = await this.repository.findPostsByIdsArray(postIdsFromComment);
-      const allPosts = postsFromComments.concat(posts)
-    // probably better to get data from DB already without users from block list to optimize it
+      const postsFromComments = await this.repository.findPostsByIdsArray(
+        postIdsFromComment,
+      );
+      const allPosts = postsFromComments.concat(posts);
+      // probably better to get data from DB already without users from block list to optimize it
       return {
-        allPosts
+        allPosts,
       };
     } catch {
       throw new HttpException('No such post', 404);
     }
   }
 
-  async getAllPostsList(): Promise<PostInterface[]>{
-    return this.repository.getAllPosts()
+  async getAllPostsList(): Promise<PostInterface[]> {
+    return this.repository.getAllPosts();
   }
 }

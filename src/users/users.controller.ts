@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
-import { UserInterface, UserLoginInterface } from 'src/auth/dto';
+import { UserInterface } from 'src/auth/dto';
 
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -12,21 +12,21 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @ApiOperation({summary: 'Get all users list'})
+  @ApiOperation({ summary: 'Get all users list' })
   @UseGuards(JwtGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
-  @ApiOperation({summary: 'Get info about you'})
+  @ApiOperation({ summary: 'Get info about you' })
   @UseGuards(JwtGuard)
-  @Get('me') 
+  @Get('me')
   findMe(@GetUser() user: UserInterface) {
     return this.usersService.findOne(user.user_id);
   }
 
-  @ApiOperation({summary: 'Get info other user'})
+  @ApiOperation({ summary: 'Get info other user' })
   @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {

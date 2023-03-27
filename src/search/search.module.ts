@@ -6,7 +6,7 @@ import { KafkaModule } from 'src/kafka/kafka.module';
 import { PostsModule } from 'src/posts/posts.module';
 import { SearchController } from './search.controller';
 import { SearchService } from './search.service';
- 
+
 @Module({
   imports: [
     ConfigModule,
@@ -20,13 +20,13 @@ import { SearchService } from './search.service';
         auth: {
           username: configService.get('ELASTICSEARCH_USERNAME'),
           password: configService.get('ELASTICSEARCH_PASSWORD'),
-        }
+        },
       }),
-      inject: [ConfigService], 
+      inject: [ConfigService],
     }),
   ],
   exports: [ElasticsearchModule],
   controllers: [SearchController],
-  providers: [SearchService, KafkaModule, PostsModule, CommentsModule]
+  providers: [SearchService, KafkaModule, PostsModule, CommentsModule],
 })
 export class SearchModule {}

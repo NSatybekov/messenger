@@ -6,6 +6,6 @@ import { KafkaModule } from 'src/kafka/kafka.module';
 @Module({
   providers: [AlertsService, KafkaModule],
   controllers: [AlertsController],
-  imports: [KafkaModule]
+  imports: [KafkaModule],
 })
 export class AlertsModule {}

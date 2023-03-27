@@ -1,10 +1,8 @@
-import { HttpException, Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { FriendsRepository } from './friends.repository';
-import { UserInterface, UserLoginInterface } from 'src/auth/dto';
+import { UserInterface } from 'src/auth/dto';
 import { FriendRequestInterface, FriendInterface } from './friends.entity';
-import e from 'express';
 import { Knex } from 'knex';
-import { stat } from 'fs';
 
 @Injectable()
 export class FriendsService {
@@ -13,7 +11,7 @@ export class FriendsService {
   async sendFriendRequest(user: UserInterface, friend_id: number) {
     const friendship = await this.getFriendsInfo(user.user_id, friend_id);
     try {
-      if (!friendship && user.user_id!== friend_id) {
+      if (!friendship && user.user_id !== friend_id) {
         const friendData: FriendRequestInterface = {
           user_id: user.user_id,
           friend_id,
@@ -38,59 +36,73 @@ export class FriendsService {
 
   async acceptFriendRequest(user: UserInterface, friend_id: number) {
     const friendship = await this.getFriendsInfo(user.user_id, friend_id);
-    try{
-        if(friendship.friend_status === 'SENT' && friendship.friend_id === user.user_id){
-            const result = await this.repository.acceptFriendRequest(friend_id ,user.user_id)
-            if(result) {
-                return 'User added'
-            }
-        } else {
-            throw new HttpException('Cant accept request', 404)
+    try {
+      if (
+        friendship.friend_status === 'SENT' &&
+        friendship.friend_id === user.user_id
+      ) {
+        const result = await this.repository.acceptFriendRequest(
+          friend_id,
+          user.user_id,
+        );
+        if (result) {
+          return 'User added';
         }
-    }
-    catch{
-        throw new HttpException('Cant accept', 404)
+      } else {
+        throw new HttpException('Cant accept request', 404);
+      }
+    } catch {
+      throw new HttpException('Cant accept', 404);
     }
   }
 
-  async deleteFriend(user: UserInterface, friend_id: number, trx?: Knex.Transaction) {
-    const friendship = await this.getFriendsInfo(user.user_id, friend_id)
-    if(friendship) {
-        return await this.repository.deleteFriend(user.user_id, friend_id)
-    }
-    else {
-        throw new HttpException('No such friend', 404)
+  async deleteFriend(
+    user: UserInterface,
+    friend_id: number,
+    trx?: Knex.Transaction,
+  ) {
+    const friendship = await this.getFriendsInfo(user.user_id, friend_id);
+    if (friendship) {
+      return await this.repository.deleteFriend(user.user_id, friend_id, trx);
+    } else {
+      throw new HttpException('No such friend', 404);
     }
   }
 
   async blockUser(user: UserInterface, friend_id: number) {
-    const trx = await this.repository.getTransaction()
-    try{
-        await this.repository.deleteFriend(user.user_id, friend_id, trx) // invoked directly so i will not get error if there is no friendship
-        const blocked = await this.repository.blockFriend(user.user_id, friend_id, trx)
-        await trx.commit()
-        return blocked
-    } catch{
-        await trx.rollback()
-        throw new HttpException('Cannot block', 404)
+    const trx = await this.repository.getTransaction();
+    try {
+      await this.repository.deleteFriend(user.user_id, friend_id, trx); // invoked directly so i will not get error if there is no friendship
+      const blocked = await this.repository.blockFriend(
+        user.user_id,
+        friend_id,
+        trx,
+      );
+      await trx.commit();
+      return blocked;
+    } catch {
+      await trx.rollback();
+      throw new HttpException('Cannot block', 404);
     }
   }
 
-  async blockStatus(requester_id: number, friend_id: number): Promise<boolean>{
-        const status = await this.repository.isUserBlockedByFriend(requester_id, friend_id)
-        if(status && status.friend_status === 'BLOCKED'){
-            return true
-        }
-        else {
-            return false
-        }
+  async blockStatus(requester_id: number, friend_id: number): Promise<boolean> {
+    const status = await this.repository.isUserBlockedByFriend(
+      requester_id,
+      friend_id,
+    );
+    if (status && status.friend_status === 'BLOCKED') {
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  async getReceivedFriendRequests(user: UserInterface){
-    return this.repository.getReceivedRequests(user.user_id)
+  async getReceivedFriendRequests(user: UserInterface) {
+    return this.repository.getReceivedRequests(user.user_id);
   }
 
-  async getSentFriendRequests(user: UserInterface){
-    return this.repository.getSentRequests(user.user_id)
+  async getSentFriendRequests(user: UserInterface) {
+    return this.repository.getSentRequests(user.user_id);
   }
 }

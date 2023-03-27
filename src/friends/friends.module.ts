@@ -6,6 +6,6 @@ import { FriendsRepository } from './friends.repository';
 @Module({
   providers: [FriendsService, FriendsRepository],
   controllers: [FriendsController],
-  exports: [FriendsService, FriendsRepository]
+  exports: [FriendsService, FriendsRepository],
 })
 export class FriendsModule {}

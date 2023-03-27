@@ -1,25 +1,24 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import {  SignInDto, SignUpDto } from "./dto";
-
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { SignInDto, SignUpDto } from './dto';
 
 @Controller('auth')
-export class AuthController{
-    constructor(private authService: AuthService) {}
+export class AuthController {
+  constructor(private authService: AuthService) {}
 
-    @Post('signup')
-    signup(@Body() dto: SignUpDto) {
-        return this.authService.signup(dto)
-    }
+  @Post('signup')
+  signup(@Body() dto: SignUpDto) {
+    return this.authService.signup(dto);
+  }
 
-    // @Post('random')
-    // random(@Body() dto: SignUpDto) {
-    //     return this.authService.createRandomUsers()
-    // }
+  // @Post('random')
+  // random(@Body() dto: SignUpDto) {
+  //     return this.authService.createRandomUsers()
+  // }
 
-    @HttpCode(HttpStatus.OK) // needs to change http code that returns to user
-    @Post('signin')
-    signin(@Body() dto: SignInDto) {
-        return this.authService.signin(dto)
-    }
+  @HttpCode(HttpStatus.OK) // needs to change http code that returns to user
+  @Post('signin')
+  signin(@Body() dto: SignInDto) {
+    return this.authService.signin(dto);
+  }
 }

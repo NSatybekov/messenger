@@ -1,43 +1,39 @@
-import { Timestamp } from "rxjs"
-import { IsEnum, IsNotEmpty, IsNumber, ValidateNested } from 'class-validator'
-import { Type } from 'class-transformer'
-import { ApiProperty } from "@nestjs/swagger"
-
-
+import { IsEnum, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export enum RoleEnum {
-   Member = 'member',
-   Admin = 'admin',
- }
-
- export type Role = RoleEnum.Member | RoleEnum.Admin
- 
-export class RoleDTO{
-   @IsEnum(RoleEnum, { message: 'Invalid role type' })
-   @IsNotEmpty()
-   role: Role;
+  Member = 'member',
+  Admin = 'admin',
 }
 
- export class ChatMemberDTO extends RoleDTO{
-   @ApiProperty({example: 'any number from users list'})
-   @IsNotEmpty()
-   user_id: number;
+export type Role = RoleEnum.Member | RoleEnum.Admin;
 
+export class RoleDTO {
+  @IsEnum(RoleEnum, { message: 'Invalid role type' })
+  @IsNotEmpty()
+  role: Role;
+}
 
-   chat_id?: number
- 
- }
+export class ChatMemberDTO extends RoleDTO {
+  @ApiProperty({ example: 'any number from users list' })
+  @IsNotEmpty()
+  user_id: number;
 
- // HOW TO COMBINE ROLES, ENUMS, DTOS, GENERICSS 
- // i just tried different things and its got problems
+  chat_id?: number;
+}
 
-export interface ChatMemberCreateInterface<Role = RoleEnum.Member | RoleEnum.Admin> { 
-    user_id: number,
-    chat_id: number,
-    role?: Role | 'member' | 'admin'
- }
+// HOW TO COMBINE ROLES, ENUMS, DTOS, GENERICSS
+// i just tried different things and its got problems
 
- export interface ChatMemberInterface extends ChatMemberCreateInterface {
-    created_at: Date,
-    left_at?: Date
- }
+export interface ChatMemberCreateInterface<
+  Role = RoleEnum.Member | RoleEnum.Admin,
+> {
+  user_id: number;
+  chat_id: number;
+  role?: Role | 'member' | 'admin';
+}
+
+export interface ChatMemberInterface extends ChatMemberCreateInterface {
+  created_at: Date;
+  left_at?: Date;
+}

@@ -7,6 +7,6 @@ import { RedisModule } from 'src/redis/redis.module';
 @Module({
   providers: [UsersService, UserRepository, RedisModule],
   controllers: [UsersController],
-  imports: [RedisModule]
+  imports: [RedisModule],
 })
 export class UsersModule {}
