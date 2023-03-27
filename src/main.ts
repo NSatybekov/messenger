@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupSwagger } from './config/swagger.config';
 import CorsConfig from './config/cors.config';
-import cluster from 'cluster';
+const cluster = require('cluster');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
